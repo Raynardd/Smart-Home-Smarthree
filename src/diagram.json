@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "author": "SmartHome Kelompok 9",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_pot1", "top": -70, "left": -215, "attrs": { "text": "O1: Kulkas" } },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": -45, "left": -200, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_pot2", "top": 40, "left": -225, "attrs": { "text": "O2: Rice Cooker" } },
+    { "type": "wokwi-potentiometer", "id": "pot2", "top": 65, "left": -200, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_pot3", "top": 150, "left": -220, "attrs": { "text": "O3: Dispenser" } },
+    { "type": "wokwi-potentiometer", "id": "pot3", "top": 175, "left": -200, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_ldr", "top": -215, "left": -130, "attrs": { "text": "LDR (Tamu)" } },
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": -185, "left": -145, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_dht1", "top": -215, "left": 0, "attrs": { "text": "DHT22 Tamu" } },
+    { "type": "wokwi-dht22", "id": "dht_tamu", "top": -185, "left": 15, "attrs": {} },
+
+    { "type": "wokwi-text", "id": "txt_dht2", "top": -215, "left": 120, "attrs": { "text": "DHT22 Kamar" } },
+    { "type": "wokwi-dht22", "id": "dht_kamar", "top": -185, "left": 135, "attrs": {} },
+
+    { "type": "wokwi-led", "id": "led_o1", "top": -40, "left": 220, "attrs": { "color": "green", "label": "O1" } },
+    { "type": "wokwi-led", "id": "led_o2", "top": -40, "left": 270, "attrs": { "color": "green", "label": "O2" } },
+    { "type": "wokwi-led", "id": "led_o3", "top": -40, "left": 320, "attrs": { "color": "green", "label": "O3" } },
+
+    { "type": "wokwi-led", "id": "led_l1", "top": 55, "left": 220, "attrs": { "color": "yellow", "label": "L1" } },
+    { "type": "wokwi-led", "id": "led_l2", "top": 55, "left": 270, "attrs": { "color": "yellow", "label": "L2" } },
+    { "type": "wokwi-led", "id": "led_l3", "top": 55, "left": 320, "attrs": { "color": "yellow", "label": "L3" } },
+    { "type": "wokwi-led", "id": "led_l4", "top": 55, "left": 370, "attrs": { "color": "yellow", "label": "L4" } },
+
+    { "type": "wokwi-led", "id": "led_ac1", "top": 150, "left": 220, "attrs": { "color": "blue", "label": "AC1" } },
+    { "type": "wokwi-led", "id": "led_ac2", "top": 150, "left": 270, "attrs": { "color": "blue", "label": "AC2" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "pot1:VCC", "esp:3V3", "red", [] ],
+    [ "pot1:GND", "esp:GND.1", "black", [] ],
+    [ "pot1:SIG", "esp:32", "orange", [] ],
+
+    [ "pot2:VCC", "esp:3V3", "red", [] ],
+    [ "pot2:GND", "esp:GND.1", "black", [] ],
+    [ "pot2:SIG", "esp:33", "orange", [] ],
+
+    [ "pot3:VCC", "esp:3V3", "red", [] ],
+    [ "pot3:GND", "esp:GND.1", "black", [] ],
+    [ "pot3:SIG", "esp:34", "orange", [] ],
+
+    [ "ldr1:VCC", "esp:3V3", "red", [] ],
+    [ "ldr1:GND", "esp:GND.1", "black", [] ],
+    [ "ldr1:AO", "esp:35", "purple", [] ],
+
+    [ "dht_tamu:VCC", "esp:3V3", "red", [] ],
+    [ "dht_tamu:GND", "esp:GND.2", "black", [] ],
+    [ "dht_tamu:SDA", "esp:4", "cyan", [] ],
+
+    [ "dht_kamar:VCC", "esp:3V3", "red", [] ],
+    [ "dht_kamar:GND", "esp:GND.1", "black", [] ],
+    [ "dht_kamar:SDA", "esp:27", "cyan", [] ],
+
+    [ "led_o1:A", "esp:21", "green", [] ],
+    [ "led_o1:C", "esp:GND.2", "black", [] ],
+    [ "led_o2:A", "esp:22", "green", [] ],
+    [ "led_o2:C", "esp:GND.2", "black", [] ],
+    [ "led_o3:A", "esp:23", "green", [] ],
+    [ "led_o3:C", "esp:GND.2", "black", [] ],
+
+    [ "led_l1:A", "esp:16", "gold", [] ],
+    [ "led_l1:C", "esp:GND.3", "black", [] ],
+    [ "led_l2:A", "esp:17", "gold", [] ],
+    [ "led_l2:C", "esp:GND.3", "black", [] ],
+    [ "led_l3:A", "esp:18", "gold", [] ],
+    [ "led_l3:C", "esp:GND.3", "black", [] ],
+    [ "led_l4:A", "esp:19", "gold", [] ],
+    [ "led_l4:C", "esp:GND.3", "black", [] ],
+
+    [ "led_ac1:A", "esp:13", "blue", [] ],
+    [ "led_ac1:C", "esp:GND.1", "black", [] ],
+    [ "led_ac2:A", "esp:14", "blue", [] ],
+    [ "led_ac2:C", "esp:GND.1", "black", [] ]
+  ]
+}

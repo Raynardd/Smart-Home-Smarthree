@@ -1,0 +1,15 @@
+# File kredensial Blynk (WAJIB di-ignore, jangan pernah commit token asli)
+secrets.h
+**/secrets.h
+
+# Editor & OS
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+build/
+.pio/
