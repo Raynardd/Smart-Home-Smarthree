@@ -20,7 +20,7 @@ Ringkasan perilaku sistem:
   3. **Outlet 2 / Rice Cooker** (`0-400 W`)
   4. **AC Ruang Tamu / AC 1** (`350 W`)
   5. **Outlet 3 / Dispenser** (`0-500 W`, diputus paling awal)
-* Jika total daya melampaui `batas_daya` (default `900 W`), beban prioritas terendah diputus hingga total di bawah batas (load shedding selalu mengalahkan mode otomatis maupun manual). Beban disambungkan kembali setelah total turun di bawah `batas_daya - 50 W` (margin `50 W`).
+* Jika total daya melampaui batas daya tetap (`LIMIT_W = 900 W`), beban prioritas terendah diputus hingga total di bawah batas (load shedding selalu mengalahkan mode otomatis maupun manual). Beban disambungkan kembali setelah total turun di bawah `LIMIT_W - 50 W` (margin `50 W`).
 
 ## Struktur Repositori
 
@@ -34,7 +34,7 @@ smart-home/
     libraries.txt       # Daftar library Wokwi
     secrets.example.h   # Contoh kredensial (salin menjadi secrets.h lokal)
   docs/
-    datastreams.md      # Konfigurasi 17 datastream & widget dashboard Blynk
+    datastreams.md      # Konfigurasi 21 datastream & widget dashboard Blynk
     pin-mapping.md      # Daftar komponen dan pemetaan pin GPIO ESP32
     diagram/            # Gambar diagram arsitektur & aliran data
 ```

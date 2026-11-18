@@ -19,6 +19,7 @@ const int PIN_LED_OUT[3]   = {21, 22, 23};
 const float AC_ON_TEMP  = 28.0;                 // AC nyala jika suhu lebih dari ini
 const float AC_OFF_TEMP = 26.0;                 // AC padam jika suhu kurang dari atau sama dengan ini
 const int   AC_WATT     = 350;                  // asumsi daya AC saat menyala
+const int   LIMIT_W     = 900;                  // batas daya tetap (hardcoded)
 const int   MARGIN_W    = 50;                   // margin sebelum beban disambung lagi
 const int   POT_MAX_W[3] = {150, 400, 500};     // rentang daya tiap outlet
 const int   LDR_GELAP_ON  = 2500;               // di atas ini dianggap gelap
@@ -34,7 +35,6 @@ int acMode[2]      = {0, 0};        // 0 = otomatis, 1 = manual (indeks 0 = AC1 
 int acSwitch[2]    = {0, 0};
 int lampuMode      = 0;             // 0 = otomatis (lampu 1 dan 2), 1 = manual
 int lampuSwitch[4] = {0, 0, 0, 0};
-int limitW         = 900;
 
 // ======== STATUS INTERNAL ========
 float tempTamu = NAN, tempKamar = NAN;
@@ -53,12 +53,14 @@ bool ledState[40];
 float  lastT[2];
 int    lastTotal;
 int    lastP[3];
+int    lastInd[4];
 String lastStatus;
 
 void resetCache() {
   lastT[0] = lastT[1] = -100;
   lastTotal = -1;
   lastP[0] = lastP[1] = lastP[2] = -1;
+  lastInd[0] = lastInd[1] = lastInd[2] = lastInd[3] = -1;
   lastStatus = "";
 }
 
@@ -84,10 +86,10 @@ BLYNK_WRITE(V5) { lampuSwitch[0] = param.asInt(); logRx("lampu1_switch", lampuSw
 BLYNK_WRITE(V6) { lampuSwitch[1] = param.asInt(); logRx("lampu2_switch", lampuSwitch[1]); }
 BLYNK_WRITE(V7) { lampuSwitch[2] = param.asInt(); logRx("lampu3_switch", lampuSwitch[2]); }
 BLYNK_WRITE(V8) { lampuSwitch[3] = param.asInt(); logRx("lampu4_switch", lampuSwitch[3]); }
-BLYNK_WRITE(V9) { limitW = param.asInt();         logRx("batas_daya", limitW); }
 
 BLYNK_CONNECTED() {
-  Blynk.syncVirtual(V0, V1, V2, V3, V4, V5, V6, V7, V8, V9);
+  Blynk.syncVirtual(V0, V1, V2, V3, V4, V5, V6, V7, V8);
+  Blynk.virtualWrite(V9, LIMIT_W);
   resetCache();
 }
 
@@ -140,7 +142,7 @@ void updateShedding() {
   // 1) putus dari prioritas terendah sampai total di bawah batas.
   //    Outlet 1 (indeks 0) tidak pernah diputus.
   bool adaPemutusan = false;
-  while (totalActive() > limitW) {
+  while (totalActive() > LIMIT_W) {
     int korban = -1;
     for (int i = 4; i >= 1; i--) {
       if (!shed[i] && demand[i] > 0) { korban = i; break; }
@@ -150,14 +152,14 @@ void updateShedding() {
     shed[korban] = true;
     adaPemutusan = true;
     Serial.printf("[%lu ms] SHED %s (%d W -> %d W, batas %d W)\n",
-                  millis(), NAMA_BEBAN[korban], sebelum, totalActive(), limitW);
+                  millis(), NAMA_BEBAN[korban], sebelum, totalActive(), LIMIT_W);
   }
 
   // 2) sambung kembali dari prioritas tertinggi, hanya jika muat dengan margin
   if (!adaPemutusan) {
     for (int i = 1; i <= 4; i++) {
       if (!shed[i]) continue;
-      if (totalActive() + demand[i] <= limitW - MARGIN_W) {
+      if (totalActive() + demand[i] <= LIMIT_W - MARGIN_W) {
         shed[i] = false;
         Serial.printf("[%lu ms] SAMBUNG %s (total %d W)\n", millis(), NAMA_BEBAN[i], totalActive());
       } else {
@@ -193,7 +195,7 @@ void controlLoop() {
 int effective(int i) { return shed[i] ? 0 : demand[i]; }
 
 String statusText() {
-  if (totalActive() > limitW) return "Peringatan: Outlet 1 melebihi batas";
+  if (totalActive() > LIMIT_W) return "Peringatan: Outlet 1 melebihi batas";
   String s = "";
   for (int i = 0; i < 5; i++) {
     if (shed[i]) {
@@ -221,6 +223,16 @@ void sendToBlynk() {
   int p[3] = {effective(0), effective(2), effective(4)};
   for (int i = 0; i < 3; i++) {
     if (p[i] != lastP[i]) { Blynk.virtualWrite(V14 + i, p[i]); lastP[i] = p[i]; }
+  }
+
+  int ind[4] = {
+    ledState[PIN_LED_AC1] ? 1 : 0,
+    ledState[PIN_LED_AC2] ? 1 : 0,
+    ledState[PIN_LED_LAMPU[0]] ? 1 : 0,
+    ledState[PIN_LED_LAMPU[1]] ? 1 : 0
+  };
+  for (int i = 0; i < 4; i++) {
+    if (ind[i] != lastInd[i]) { Blynk.virtualWrite(V17 + i, ind[i]); lastInd[i] = ind[i]; }
   }
 
   String st = statusText();
