@@ -29,10 +29,11 @@ smart-home/
   README.md
   .gitignore
   src/
-    sketch.ino          # Program utama ESP32 + Blynk + Wokwi
-    diagram.json        # Skema rangkaian virtual Wokwi
-    libraries.txt       # Daftar library Wokwi
-    secrets.example.h   # Contoh kredensial (salin menjadi secrets.h lokal)
+    sketch.ino                  # Program utama ESP32 + Blynk + Wokwi
+    diagram.json                # Skema rangkaian virtual Wokwi
+    libraries.txt               # Daftar library Wokwi
+    blynk-indicator-widget.html # HTML Widget 4 indikator status aktual Blynk
+    secrets.example.h           # Contoh kredensial (salin menjadi secrets.h lokal)
   docs/
     datastreams.md      # Konfigurasi 21 datastream & widget dashboard Blynk
     pin-mapping.md      # Daftar komponen dan pemetaan pin GPIO ESP32

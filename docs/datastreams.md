@@ -37,7 +37,7 @@ Template Name: `SmartHome`
 | Switch | `V4` | Label `Lampu 1-2 Manual` |
 | Switch (4) | `V5`, `V6`, `V7`, `V8` | Lampu 1 (Tamu), Lampu 2 (Dapur), Lampu 3 (Kamar), Lampu 4 (Mandi) |
 | Value / Label | `V9` | Batas Daya (menampilkan nilai tetap `900 W`) |
-| LED (4) | `V17`, `V18`, `V19`, `V20` | Indikator nyala/padam aktual: `Status AC 1`, `Status AC 2`, `Status Lampu 1`, `Status Lampu 2` (terlihat saat mode otomatis maupun saat kena *load shedding*) |
+| HTML (1) | `V17`, `V18`, `V19`, `V20` | Widget HTML kustom (`src/blynk-indicator-widget.html`) yang menampilkan 4 indikator status aktual (`Status AC 1`, `Status AC 2`, `Status Lampu 1`, `Status Lampu 2`) dalam satu kartu (berurutan index `0`–`3`) |
 | Label | `V13` | Status Beban (teks: `Aman`, `Diputus: ...`, atau peringatan) |
 | Value / Label | `V12` | Total Daya (W) |
 | Gauge (2) | `V10`, `V11` | Suhu Tamu dan Suhu Kamar, rentang `15-40` °C |
