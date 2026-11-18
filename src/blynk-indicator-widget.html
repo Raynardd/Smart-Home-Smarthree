@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indikator Status Aktual Smart Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Warna selaras dengan tema Blynk Console (Lime Green & Neutral Light) */
+      --accent: #a7d700;
+      --accent-deep: #7aa300;
+      --accent-bg: #f6fbe6;
+      --accent-border: #c5e655;
+      --text-primary: #1f2328;
+      --text-secondary: #6b7280;
+      --card-bg: #f9fafb;
+      --card-border: #e5e7eb;
+      --pill-off: #6e737b;
+      --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      background: transparent;
+      color: var(--text-primary);
+      padding: 4px 2px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    /* Indikator pill bergaya switch Blynk (read-only) */
+    .pill {
+      position: relative;
+      width: 30px;
+      height: 17px;
+      border-radius: 999px;
+      background: var(--pill-off);
+      transition: background-color 0.2s ease;
+    }
+
+    .pill::after {
+      content: "";
+      position: absolute;
+      top: 2.5px;
+      left: 2.5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    .state-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      min-width: 22px;
+    }
+
+    /* Kondisi NYALA mengikuti warna aksen dashboard Blynk */
+    .item.is-on {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+    }
+
+    .item.is-on .pill {
+      background: var(--accent);
+    }
+
+    .item.is-on .pill::after {
+      transform: translateX(13px);
+    }
+
+    .item.is-on .state-text {
+      color: var(--accent-deep);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <div class="item" id="card-0">
+      <div class="info">
+        <span class="name">AC 1</span>
+        <span class="sub">Ruang Tamu</span>
+      </div>
+      <div class="status">
+        <span class="pill" aria-hidden="true"></span>
+        <span class="state-text" id="txt-0">Off</span>
+      </div>
+    </div>
+
+    <div class="item" id="card-1">
+      <div class="info">
+        <span class="name">AC 2</span>
+        <span class="sub">Kamar Tidur</span>
+      </div>
+      <div class="status">
+        <span class="pill" aria-hidden="true"></span>
+        <span class="state-text" id="txt-1">Off</span>
+      </div>
+    </div>
+
+    <div class="item" id="card-2">
+      <div class="info">
+        <span class="name">Lampu 1</span>
+        <span class="sub">Ruang Tamu</span>
+      </div>
+      <div class="status">
+        <span class="pill" aria-hidden="true"></span>
+        <span class="state-text" id="txt-2">Off</span>
+      </div>
+    </div>
+
+    <div class="item" id="card-3">
+      <div class="info">
+        <span class="name">Lampu 2</span>
+        <span class="sub">Dapur</span>
+      </div>
+      <div class="status">
+        <span class="pill" aria-hidden="true"></span>
+        <span class="state-text" id="txt-3">Off</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Urutan Datastream pada pengaturan HTML Widget di Blynk:
+    // Index 0 = status_ac1 (V17)
+    // Index 1 = status_ac2 (V18)
+    // Index 2 = status_lampu1 (V19)
+    // Index 3 = status_lampu2 (V20)
+    function updateIndicator(index, rawValue) {
+      if (index < 0 || index > 3) return;
+      const card = document.getElementById("card-" + index);
+      const txt = document.getElementById("txt-" + index);
+      if (!card || !txt) return;
+
+      const isOn = Number(rawValue) === 1;
+      card.classList.toggle("is-on", isOn);
+      txt.textContent = isOn ? "On" : "Off";
+    }
+
+    function applyTheme(theme) {
+      if (!theme) return;
+      const root = document.documentElement.style;
+      const set = (name, val) => { if (val) root.setProperty(name, val); };
+
+      // Ambil font & warna langsung dari tema aktif Blynk Console
+      set("--font-primary", theme.primaryFont);
+      set("--text-primary", theme.textPrimary);
+      set("--accent", theme.brand);
+      if (theme.brand) {
+        set("--accent-deep", `color-mix(in srgb, ${theme.brand} 60%, #1f2328)`);
+        set("--accent-bg", `color-mix(in srgb, ${theme.brand} 12%, #ffffff)`);
+        set("--accent-border", `color-mix(in srgb, ${theme.brand} 55%, #ffffff)`);
+      }
+    }
+
+    const bridge = (typeof BlynkBridge !== "undefined")
+      ? new BlynkBridge({ logEnabled: false, isOnErrorEnabled: true })
+      : {
+          // Fallback untuk pratinjau lokal di browser (di luar Blynk)
+          setCallbacks: () => {},
+          getTheme: async () => null,
+          getValues: async () => [
+            { index: 0, value: 1 },
+            { index: 1, value: 0 },
+            { index: 2, value: 1 },
+            { index: 3, value: 0 }
+          ]
+        };
+
+    async function init() {
+      bridge.setCallbacks({
+        onValueUpdated: (v) => updateIndicator(v.index, v.value),
+        onThemeUpdated: applyTheme,
+        onError: (msg) => console.error("BlynkBridge error:", msg)
+      });
+
+      try {
+        const theme = await bridge.getTheme();
+        applyTheme(theme);
+      } catch (_) {}
+
+      try {
+        const values = await bridge.getValues();
+        if (Array.isArray(values)) {
+          values.forEach((v, idx) => {
+            const dsIndex = (typeof v.index === "number") ? v.index : idx;
+            updateIndicator(dsIndex, v.value);
+          });
+        }
+      } catch (err) {
+        console.error("Gagal membaca nilai awal:", err);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
